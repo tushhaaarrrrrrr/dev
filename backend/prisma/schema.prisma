@@ -12,3 +12,121 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int             @id @default(autoincrement())
+  name         String
+  email        String          @unique
+  passwordHash String          @map("password_hash")
+  role         UserRole
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  
+  // Relations
+  linkedProfiles LinkedProfile[]
+  campaigns      Campaign[]
+  matchesAsAdvertiser Match[] @relation("AdvertiserMatches")
+  matchesAsCreator Match[] @relation("CreatorMatches")
+  chatsAsSender   Chat[] @relation("SenderChats")
+  chatsAsReceiver Chat[] @relation("ReceiverChats")
+  userKey         UserKey?
+
+  @@index([email])
+}
+
+enum UserRole {
+  creator
+  advertiser
+}
+
+model LinkedProfile {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  platform     SocialPlatform
+  accessToken  String   @map("access_token")
+  refreshToken String   @map("refresh_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user         User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId, platform], name: "user_platform_idx")
+}
+
+enum SocialPlatform {
+  Facebook
+  Instagram
+  YouTube
+  Twitch
+}
+
+model Campaign {
+  id              Int       @id @default(autoincrement())
+  advertiserId    Int       @map("advertiser_id")
+  title           String
+  description     String?
+  budget          Float
+  targetAudience  Json      @map("target_audience")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  advertiser      User      @relation(fields: [advertiserId], references: [id])
+
+  @@index([advertiserId])
+}
+
+model Match {
+  id              Int       @id @default(autoincrement())
+  advertiserId    Int       @map("advertiser_id")
+  creatorId       Int       @map("creator_id")
+  status          MatchStatus @default(pending)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  advertiser      User      @relation("AdvertiserMatches", fields: [advertiserId], references: [id])
+  creator         User      @relation("CreatorMatches", fields: [creatorId], references: [id])
+
+  @@index([advertiserId, creatorId])
+}
+
+enum MatchStatus {
+  pending
+  approved
+  declined
+}
+
+model Chat {
+  id              Int       @id @default(autoincrement())
+  senderId        Int       @map("sender_id")
+  receiverId      Int       @map("receiver_id")
+  message         String
+  isEncrypted     Boolean   @default(false) @map("is_encrypted")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  sender          User      @relation("SenderChats", fields: [senderId], references: [id])
+  receiver        User      @relation("ReceiverChats", fields: [receiverId], references: [id])
+
+  @@index([senderId, receiverId])
+}
+
+model UserKey {
+  userId     Int      @id
+  publicKey  String   @map("public_key")
+  privateKey String   @map("private_key")
+
+  // Relations
+  user       User     @relation(fields: [userId], references: [id])
+}
