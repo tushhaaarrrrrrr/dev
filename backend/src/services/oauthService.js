@@ -1,0 +1,1 @@
+// Manages OAuth integrations for platforms.

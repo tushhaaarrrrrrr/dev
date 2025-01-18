@@ -1,0 +1,1 @@
+// Initializes and starts the backend server.

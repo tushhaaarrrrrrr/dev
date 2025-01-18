@@ -1,0 +1,1 @@
+// Shows detailed view of a campaign.

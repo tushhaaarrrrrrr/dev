@@ -1,0 +1,1 @@
+// Defines shared constants like roles or status values.

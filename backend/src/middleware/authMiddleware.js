@@ -1,0 +1,1 @@
+// Verifies JWT tokens for protected routes.

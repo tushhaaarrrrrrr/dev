@@ -1,0 +1,1 @@
+// Component for linking social profiles.

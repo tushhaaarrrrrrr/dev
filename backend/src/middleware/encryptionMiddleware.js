@@ -1,0 +1,1 @@
+// Encrypts/decrypts data when needed.

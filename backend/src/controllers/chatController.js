@@ -1,0 +1,1 @@
+// Handles chat messages and encryption.

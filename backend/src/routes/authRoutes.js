@@ -1,0 +1,1 @@
+// Defines routes for authentication.

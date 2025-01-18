@@ -1,0 +1,1 @@
+// Handles user authentication and JWT logic.
