@@ -13,16 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// schema.prisma
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
   id           Int             @id @default(autoincrement())
-  name         String
-  email        String          @unique
+  name         String          @db.VarChar(100)
+  email        String          @unique @db.VarChar(255) @db.Check("email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'")
   passwordHash String          @map("password_hash")
   role         UserRole
   createdAt    DateTime        @default(now()) @map("created_at")
@@ -69,8 +63,8 @@ enum SocialPlatform {
 model Campaign {
   id              Int       @id @default(autoincrement())
   advertiserId    Int       @map("advertiser_id")
-  title           String
-  description     String?
+  title           String    @db.VarChar(255)
+  description     String?   @db.VarChar(1000)
   budget          Float
   targetAudience  Json      @map("target_audience")
   createdAt       DateTime  @default(now()) @map("created_at")
